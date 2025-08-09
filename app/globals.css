@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    font-family: 'Open Sans', system-ui, sans-serif;
+    background-color: bg-gray-500;
+    color: #000;
+  }
+}
+
+
+@layer components {
+  .btn-primary {
+  @apply bg-dx-gold text-dx-black font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-dx-gold-dark transition-colors duration-200;
+}
+
+.input-field {
+  @apply w-full px-3 py-2 rounded-lg bg-white border border-dx-gold text-dx-black focus:outline-none focus:ring-2 focus:ring-dx-gold-dark focus:border-transparent;
+}
+
+
+  
+  .btn-secondary {
+    @apply bg-gray-100 text-dx-black font-medium py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors duration-200;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+  
+.btn-primary:focus-visible {
+  @apply outline-none ring-2 ring-dx-gold-dark ring-offset-2;
+}
+
+  .card {
+  @apply bg-white border border-dx-gold rounded-lg p-6 shadow-md;
+}
+.card:hover {
+  @apply shadow-lg scale-105 transition-transform duration-200 ease-in-out;
+}
+
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateX(150%);
+  }
+}
+.animate-shimmer {
+  animation: shimmer 3s infinite linear;
+}
+
+@keyframes sparkle-twinkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.sparkle {
+  animation: sparkle-twinkle 2.5s infinite ease-in-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+.animate-ripple {
+  animation: ripple 0.6s ease-out forwards;
+}
+
+@keyframes gradient-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.animate-gradient-move {
+  background-size: 200% 200%;
+  animation: gradient-move 20s ease infinite;
+}
+
+/* Backdrop blur support if your tailwind version doesn't include it: */
+.backdrop-blur-sm {
+  backdrop-filter: blur(6px);
+}
