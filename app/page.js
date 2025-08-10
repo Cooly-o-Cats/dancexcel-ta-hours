@@ -38,7 +38,7 @@ export default function Home() {
           className={`relative text-7xl font-extrabold mb-8 bg-gradient-to-r from-dx-gold to-yellow-400 bg-clip-text text-transparent
             transition-opacity duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0'}`}
         >
-          Welcome to DanceXcel's TA Family
+          Welcome to DanceXcel's TA Portal
 
           {/* Shimmer overlays */}
           <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer pointer-events-none" />
