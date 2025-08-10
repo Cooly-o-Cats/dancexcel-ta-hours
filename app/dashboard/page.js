@@ -218,6 +218,10 @@ export default function DashboardPage() {
         <h2 className="text-xl font-semibold text-dx-gold">Recent Hours Logged</h2>
         <span className="text-sm text-dx-gold/70">{hours.length} entries</span>
       </div>
+      <div className="md:hidden mb-2 text-sm text-gray-600 italic">
+  ⚠️ Table is wide — swipe horizontally to see all columns.
+</div>
+
       <HoursTable hours={hours} onDelete={handleDelete} />
     </div>
   </div>
