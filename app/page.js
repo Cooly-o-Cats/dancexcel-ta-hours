@@ -35,20 +35,28 @@ export default function Home() {
       <main className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 py-20 select-none">
         {/* Heading with shimmer */}
         <h1
-          className={`relative text-7xl font-extrabold mb-8 bg-gradient-to-r from-dx-gold to-yellow-400 bg-clip-text text-transparent
-            transition-opacity duration-1000 ease-in-out ${loaded ? 'opacity-100' : 'opacity-0'}`}
-        >
-          Welcome to DanceXcel's TA Porta
+  className={`relative
+    text-4xl sm:text-5xl md:text-6xl lg:text-7xl
+    font-extrabold mb-8
+    max-w-4xl
+    mx-auto
+    px-4
+    bg-gradient-to-r from-dx-gold to-yellow-400 bg-clip-text text-transparent
+    transition-opacity duration-1000 ease-in-out
+    ${loaded ? 'opacity-100' : 'opacity-0'}
+  `}
+  style={{ wordBreak: 'break-word' }}
+>
+  Welcome to DanceXcel&apos;s<br />TA Portal
+  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer pointer-events-none" />
+  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer animate-delay-2000 pointer-events-none" />
+</h1>
 
-          {/* Shimmer overlays */}
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer pointer-events-none" />
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer animate-delay-2000 pointer-events-none" />
-        </h1>
 
         {/* Subtitle with backdrop blur */}
-        <p className="max-w-xl text-dx-black text-lg mb-12 px-6 py-3 rounded-lg bg-white/40 backdrop-blur-sm inline-block">
-          We’re so glad you’re here! Log your hours, track your progress, and be part of our studio’s growth.
-        </p>
+        <p className="max-w-xl mx-auto text-dx-black text-lg mb-12 px-6 py-3 rounded-lg bg-white/40 backdrop-blur-sm inline-block break-words">
+  We’re so glad you’re here! Log your hours, track your progress, and be part of our studio’s growth.
+</p>
 
         {/* Buttons */}
         <div className="flex gap-10 z-10">
