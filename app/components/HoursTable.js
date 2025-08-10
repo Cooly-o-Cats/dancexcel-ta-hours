@@ -37,7 +37,6 @@ export default function HoursTable({ hours, onDelete }) {
       })
 
       if (response.ok) {
-        // Refresh the page or update local state
         window.location.reload()
       } else {
         alert('Failed to update entry')
@@ -66,7 +65,7 @@ export default function HoursTable({ hours, onDelete }) {
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto w-full">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
@@ -82,14 +81,14 @@ export default function HoursTable({ hours, onDelete }) {
               <Clock className="w-4 h-4 inline mr-1" />
               Hours
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider max-w-xs">
               <FileText className="w-4 h-4 inline mr-1" />
               Notes
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Submitted
             </th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[110px]">
               Actions
             </th>
           </tr>
@@ -109,7 +108,7 @@ export default function HoursTable({ hours, onDelete }) {
                   <input
                     type="number"
                     value={editData.hours}
-                    onChange={(e) => setEditData({...editData, hours: e.target.value})}
+                    onChange={(e) => setEditData({ ...editData, hours: e.target.value })}
                     min="0.25"
                     step="0.25"
                     className="w-20 px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -122,7 +121,7 @@ export default function HoursTable({ hours, onDelete }) {
                 {editingId === hour.id ? (
                   <textarea
                     value={editData.notes}
-                    onChange={(e) => setEditData({...editData, notes: e.target.value})}
+                    onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
                     rows={2}
                     className="w-full px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                   />
@@ -135,7 +134,7 @@ export default function HoursTable({ hours, onDelete }) {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {formatDate(hour.created_at)}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium min-w-[110px]">
                 {editingId === hour.id ? (
                   <div className="flex justify-end gap-2">
                     <button
