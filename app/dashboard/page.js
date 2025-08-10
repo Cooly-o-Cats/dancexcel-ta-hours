@@ -179,36 +179,37 @@ export default function DashboardPage() {
       </div>
 
       {taHoursSummary.length > 0 ? (
-        <div className="space-y-4">
-          {taHoursSummary.map((ta, index) => (
-            <div
-              key={ta.name}
-              className="flex items-center justify-between p-4 bg-dx-gold/20 rounded-lg border border-dx-gold"
-            >
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-dx-gold/20 text-black rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                  {index + 1}
-                </div>
-                <div>
-                  <div className="font-medium text-black">{ta.name}</div>
-                  <div className="text-sm text-black/60">{ta.email}</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-bold text-dx-gold-dark">{ta.totalHours} hours</div>
-                <div className="text-sm text-black/60">
-                  {ta.entryCount} {ta.entryCount === 1 ? 'entry' : 'entries'}
-                </div>
-              </div>
-            </div>
-          ))}
+  <div className="space-y-4">
+    {taHoursSummary.map((ta, index) => (
+      <div
+        key={ta.name}
+        className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-dx-gold/20 rounded-lg border border-dx-gold"
+      >
+        <div className="flex items-center mb-2 sm:mb-0 sm:min-w-[200px]">
+          <div className="w-8 h-8 bg-dx-gold/20 text-black rounded-full flex items-center justify-center text-sm font-medium mr-3 flex-shrink-0">
+            {index + 1}
+          </div>
+          <div className="min-w-0">
+            <div className="font-medium text-black truncate">{ta.name}</div>
+            <div className="text-sm text-black/60 truncate">{ta.email}</div>
+          </div>
         </div>
-      ) : (
-        <div className="text-center py-8">
-          <Users className="w-12 h-12 mx-auto mb-4 text-dx-gold/40" />
-          <p className="text-dx-gold/70">No hours logged yet</p>
+        <div className="text-right sm:text-left">
+          <div className="text-lg font-bold text-dx-gold-dark whitespace-nowrap">{ta.totalHours} hours</div>
+          <div className="text-sm text-black/60 whitespace-nowrap">
+            {ta.entryCount} {ta.entryCount === 1 ? 'entry' : 'entries'}
+          </div>
         </div>
-      )}
+      </div>
+    ))}
+  </div>
+) : (
+  <div className="text-center py-8">
+    <Users className="w-12 h-12 mx-auto mb-4 text-dx-gold/40" />
+    <p className="text-dx-gold/70">No hours logged yet</p>
+  </div>
+)}
+
     </div>
 
     {/* Hours Table */}
