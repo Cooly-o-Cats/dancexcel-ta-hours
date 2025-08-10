@@ -37,10 +37,10 @@
 }
 
   .card {
-  @apply bg-white border border-dx-gold rounded-lg p-6 shadow-md;
+  @apply bg-white border border-dx-gold rounded-lg p-6 shadow-md transition-transform duration-200 ease-in-out shadow-md;;
 }
 .card:hover {
-  @apply shadow-lg scale-105 transition-transform duration-200 ease-in-out;
+  @apply shadow-lg scale-105;
 }
 
 }
