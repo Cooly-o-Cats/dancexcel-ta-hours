@@ -2,13 +2,8 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    res.setHeader('Allow', 'GET');
-    return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
-  }
-
-  const testEmail = 'lilyreitsma@icloud.com'; // Change if needed
+export async function GET(request) {
+  const testEmail = 'lilyreitsma@icloud.com';
 
   try {
     console.log("Attempting to send test email to:", testEmail);
@@ -31,9 +26,15 @@ export default async function handler(req, res) {
 
     console.log("Resend API response:", emailData);
 
-    res.status(200).json({ success: true, data: emailData });
+    return new Response(JSON.stringify({ success: true, data: emailData }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error("Error sending test email:", error);
-    res.status(500).json({ success: false, error: error.message });
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
