@@ -19,7 +19,7 @@ export default function AddHoursPage() {
     try {
       const response = await fetch('/api/tas')
       const data = await response.json()
-      
+
       if (response.ok) {
         setTas(data.tas)
       } else {
@@ -34,7 +34,9 @@ export default function AddHoursPage() {
 
   const handleSuccess = () => {
     setSuccess(true)
-    setTimeout(() => setSuccess(false), 5000)
+    setTimeout(() => {
+      setSuccess(false)
+    }, 5000)
   }
 
   if (loading) {

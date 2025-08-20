@@ -49,10 +49,13 @@ export async function GET(request) {
 // POST - Create new hour entry
 export async function POST(request) {
   try {
+    console.log('=== Starting POST request ===')
     const { ta_id, date, hours, notes } = await request.json()
+    console.log('Request data:', { ta_id, date, hours, notes })
 
     // Basic validation
     if (!ta_id || !date || !hours) {
+      console.log('Validation failed: missing required fields')
       return NextResponse.json(
         { error: 'TA, date, and hours are required' },
         { status: 400 }
@@ -60,12 +63,14 @@ export async function POST(request) {
     }
 
     if (hours <= 0) {
+      console.log('Validation failed: hours <= 0')
       return NextResponse.json(
         { error: 'Hours must be greater than 0' },
         { status: 400 }
       )
     }
 
+    console.log('Getting TA details...')
     // Get TA details for email
     const { data: ta, error: taError } = await supabase
       .from('tas')
@@ -74,13 +79,50 @@ export async function POST(request) {
       .single()
 
     if (taError || !ta) {
+      console.log('TA error:', taError)
       return NextResponse.json(
         { error: 'Invalid TA selected' },
         { status: 400 }
       )
     }
+    console.log('TA found:', ta)
 
-    // Insert hours record
+    // Insert hours record with pay_period
+    const payPeriod = new Date(date).toISOString().slice(0, 7)
+    console.log('Pay period:', payPeriod)
+    
+    console.log('Checking existing payroll...')
+    // Check if this TA has already been paid for this pay period
+    const { data: existingPayroll, error: payrollCheckError } = await supabase
+      .from('payroll_summary')
+      .select('paid, paid_date')
+      .eq('ta_id', ta_id)
+      .eq('pay_period', payPeriod)
+      .single()
+    
+    console.log('Existing payroll:', existingPayroll)
+    console.log('Payroll check error:', payrollCheckError)
+    
+    // If TA was already paid for this month, mark them as unpaid but keep paid_date
+    if (existingPayroll && existingPayroll.paid) {
+      console.log('TA was paid, marking as unpaid...')
+      await supabase
+        .from('payroll_summary')
+        .update({ 
+          paid: false
+        })
+        .eq('ta_id', ta_id)
+        .eq('pay_period', payPeriod)
+
+      await supabase
+        .from('hours')
+        .update({ paid: false })
+        .eq('ta_id', ta_id)
+        .eq('pay_period', payPeriod)
+      console.log('Marked as unpaid successfully')
+    }
+
+    console.log('Inserting hour record...')
     const { data: hourRecord, error: insertError } = await supabase
       .from('hours')
       .insert([
@@ -88,16 +130,21 @@ export async function POST(request) {
           ta_id,
           date,
           hours,
-          notes: notes || null
+          notes: notes || null,
+          pay_period: payPeriod,
+          paid: false
         }
       ])
       .select()
       .single()
 
     if (insertError) {
+      console.log('Insert error:', insertError)
       throw insertError
     }
+    console.log('Hour record inserted:', hourRecord)
 
+    console.log('Sending email...')
     // Send confirmation email
     try {
       await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/send-email`, {
@@ -111,11 +158,12 @@ export async function POST(request) {
           notes
         })
       })
+      console.log('Email sent successfully')
     } catch (emailError) {
       console.error('Email sending failed:', emailError)
-      // Don't fail the request if email fails
     }
 
+    console.log('Returning success response')
     return NextResponse.json({ 
       success: true, 
       message: 'Hours logged successfully',

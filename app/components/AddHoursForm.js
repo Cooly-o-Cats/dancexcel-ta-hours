@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Calendar, Clock, User, FileText } from 'lucide-react'
 
-export default function AddHoursForm({ tas, onSuccess }) {
+export default function AddHoursForm({ tas, onSuccess, onError }) {
   const [formData, setFormData] = useState({
     ta_id: '',
     date: '',
@@ -21,51 +21,54 @@ export default function AddHoursForm({ tas, onSuccess }) {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+  e.preventDefault()
+  setLoading(true)
+  setError('')
 
-    if (!formData.ta_id || !formData.date || !formData.hours) {
-      setError('Please fill in all required fields')
-      setLoading(false)
-      return
-    }
-
-    if (parseFloat(formData.hours) <= 0) {
-      setError('Hours must be greater than 0')
-      setLoading(false)
-      return
-    }
-
-    try {
-      const response = await fetch('/api/hours', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          hours: parseFloat(formData.hours)
-        }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setFormData({
-          ta_id: '',
-          date: '',
-          hours: '',
-          notes: ''
-        })
-        onSuccess()
-      } else {
-        setError(data.error || 'Failed to log hours')
-      }
-    } catch {
-      setError('Network error occurred')
-    } finally {
-      setLoading(false)
-    }
+  // Basic validation
+  if (!formData.ta_id || !formData.date || !formData.hours) {
+    setError('Please fill in all required fields')
+    setLoading(false)
+    return
   }
+
+  if (parseFloat(formData.hours) <= 0) {
+    setError('Hours must be greater than 0')
+    setLoading(false)
+    return
+  }
+
+  try {
+    const response = await fetch('/api/hours', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...formData,
+        hours: parseFloat(formData.hours)
+      }),
+    })
+
+    const data = await response.json()
+
+    if (response.ok) {
+      // Reset form
+      setFormData({
+        ta_id: '',
+        date: '',
+        hours: '',
+        notes: ''
+      })
+      
+      onSuccess() // Simplified - no parameters
+    } else {
+      setError(data.error || 'Failed to log hours')
+    }
+  } catch (error) {
+    setError('Failed to log hours. Please try again.')
+  } finally {
+    setLoading(false)
+  }
+}
 
   const today = new Date().toISOString().split('T')[0]
 
