@@ -2,6 +2,10 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Without this, Next prerenders this route at build time and actually sends
+// the test email on every production build.
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   const testEmail = 'lilyreitsma@icloud.com';
 

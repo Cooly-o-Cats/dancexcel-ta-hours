@@ -35,13 +35,17 @@ export async function POST(request) {
     // Check if email already exists
     const { data: existingTA, error: checkError } = await supabase
       .from('tas')
-      .select('email')
+      .select('email, active')
       .eq('email', email.toLowerCase())
       .single()
 
     if (existingTA) {
       return NextResponse.json(
-        { error: 'A TA with this email already exists' },
+        {
+          error: existingTA.active
+            ? 'A TA with this email already exists'
+            : 'A deactivated TA already uses this email — reactivate them from the list below instead'
+        },
         { status: 400 }
       )
     }
@@ -73,6 +77,59 @@ export async function POST(request) {
     console.error('Add TA error:', error)
     return NextResponse.json(
       { error: 'Failed to add TA' },
+      { status: 500 }
+    )
+  }
+}
+
+// PATCH - Reactivate a deactivated TA (admin only)
+export async function PATCH(request) {
+  try {
+    const authenticated = await isAuthenticated(request)
+    if (!authenticated) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const { id, active } = await request.json()
+
+    if (!id || typeof active !== 'boolean') {
+      return NextResponse.json(
+        { error: 'TA ID and active status are required' },
+        { status: 400 }
+      )
+    }
+
+    const { data: updatedTA, error: updateError } = await supabase
+      .from('tas')
+      .update({ active })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (updateError) {
+      throw updateError
+    }
+
+    if (!updatedTA) {
+      return NextResponse.json(
+        { error: 'TA not found' },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: active ? 'TA reactivated successfully' : 'TA deactivated successfully',
+      ta: updatedTA
+    })
+
+  } catch (error) {
+    console.error('Update TA status error:', error)
+    return NextResponse.json(
+      { error: 'Failed to update TA status' },
       { status: 500 }
     )
   }

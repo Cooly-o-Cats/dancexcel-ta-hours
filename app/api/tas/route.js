@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import supabase from '../../../lib/supabase'
 
+// This route reads query params and the database, so it must never be
+// statically prerendered at build time.
+export const dynamic = 'force-dynamic'
+
 // GET - Fetch all TAs
 // By default only active TAs are returned (used for hour-entry dropdowns).
 // Pass ?includeInactive=true to also get deactivated TAs, for the admin

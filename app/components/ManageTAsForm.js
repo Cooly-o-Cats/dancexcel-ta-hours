@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { UserPlus, UserMinus, Mail, User, Trash2, AlertTriangle } from 'lucide-react'
+import { UserPlus, UserMinus, UserCheck, Mail, User, Trash2, AlertTriangle } from 'lucide-react'
 
 export default function ManageTAsForm({ tas, onUpdate }) {
   const [showAddForm, setShowAddForm] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '' })
   const [loading, setLoading] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState({})
+  const [reactivateLoading, setReactivateLoading] = useState({})
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -65,12 +66,44 @@ export default function ManageTAsForm({ tas, onUpdate }) {
   const activeCount = tas.filter((ta) => ta.active).length
   const inactiveCount = tas.length - activeCount
 
+  const handleReactivateTA = async (ta) => {
+    setReactivateLoading((prev) => ({ ...prev, [ta.id]: true }))
+    setError('')
+    setSuccess('')
+
+    try {
+      const token = localStorage.getItem('admin_token')
+      const response = await fetch('/api/tas/manage', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: ta.id, active: true })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setSuccess(`${ta.name} has been reactivated`)
+        onUpdate() // Refresh the TA list
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        setError(data.error || 'Failed to reactivate TA')
+      }
+    } catch (error) {
+      setError('Network error occurred')
+    } finally {
+      setReactivateLoading((prev) => ({ ...prev, [ta.id]: false }))
+    }
+  }
+
   const handleDeleteTA = async (ta) => {
     if (!confirm(`Are you sure you want to remove ${ta.name}? If they have logged hours they will be deactivated instead of deleted, so their history is kept.`)) {
       return
     }
 
-    setDeleteLoading({ ...deleteLoading, [ta.id]: true })
+    setDeleteLoading((prev) => ({ ...prev, [ta.id]: true }))
     setError('')
     setSuccess('')
 
@@ -101,7 +134,7 @@ export default function ManageTAsForm({ tas, onUpdate }) {
     } catch (error) {
       setError('Network error occurred')
     } finally {
-      setDeleteLoading({ ...deleteLoading, [ta.id]: false })
+      setDeleteLoading((prev) => ({ ...prev, [ta.id]: false }))
     }
   }
 
@@ -218,18 +251,36 @@ export default function ManageTAsForm({ tas, onUpdate }) {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleDeleteTA(ta)}
-                  disabled={deleteLoading[ta.id]}
-                  className="text-red-600 hover:text-red-800 disabled:opacity-50 p-2 rounded-md hover:bg-red-50"
-                  title={ta.active ? "Remove TA" : "Permanently delete this deactivated TA"}
-                >
-                  {deleteLoading[ta.id] ? (
-                    <div className="animate-spin h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full"></div>
-                  ) : (
-                    <Trash2 className="w-4 h-4" />
-                  )}
-                </button>
+                {ta.active ? (
+                  <button
+                    onClick={() => handleDeleteTA(ta)}
+                    disabled={deleteLoading[ta.id]}
+                    className="text-red-600 hover:text-red-800 disabled:opacity-50 p-2 rounded-md hover:bg-red-50"
+                    title="Remove TA"
+                  >
+                    {deleteLoading[ta.id] ? (
+                      <div className="animate-spin h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full"></div>
+                    ) : (
+                      <Trash2 className="w-4 h-4" />
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleReactivateTA(ta)}
+                    disabled={reactivateLoading[ta.id]}
+                    className="flex items-center text-sm font-semibold text-dx-black bg-white hover:bg-dx-gold disabled:opacity-50 px-3 py-2 rounded-lg border border-dx-gold transition-colors duration-200"
+                    title={`Reactivate ${ta.name}`}
+                  >
+                    {reactivateLoading[ta.id] ? (
+                      <div className="animate-spin h-4 w-4 border-2 border-dx-gold-dark border-t-transparent rounded-full"></div>
+                    ) : (
+                      <>
+                        <UserCheck className="w-4 h-4 mr-2" />
+                        Reactivate
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -250,6 +301,7 @@ export default function ManageTAsForm({ tas, onUpdate }) {
             <p>• TAs with no hours logged will be permanently deleted</p>
             <p>• TAs with existing hours will be deactivated, not deleted</p>
             <p>• Deactivated TAs stay in this list marked <span className="font-medium">Deactivated</span>, but no longer appear when logging new hours</p>
+            <p>• You can reactivate them at any time — their past hours are never lost</p>
           </div>
         </div>
       </div>
