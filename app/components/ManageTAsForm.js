@@ -62,8 +62,11 @@ export default function ManageTAsForm({ tas, onUpdate }) {
     }
   }
 
+  const activeCount = tas.filter((ta) => ta.active).length
+  const inactiveCount = tas.length - activeCount
+
   const handleDeleteTA = async (ta) => {
-    if (!confirm(`Are you sure you want to delete ${ta.name}? This action cannot be undone.`)) {
+    if (!confirm(`Are you sure you want to remove ${ta.name}? If they have logged hours they will be deactivated instead of deleted, so their history is kept.`)) {
       return
     }
 
@@ -86,7 +89,7 @@ export default function ManageTAsForm({ tas, onUpdate }) {
 
       if (response.ok) {
         if (data.deactivated) {
-          setSuccess(`${ta.name} has been deactivated (had existing hours)`)
+          setSuccess(`${ta.name} has been deactivated — their logged hours were kept`)
         } else {
           setSuccess(`${ta.name} has been deleted successfully`)
         }
@@ -181,7 +184,10 @@ export default function ManageTAsForm({ tas, onUpdate }) {
       <div className="card">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Current Teaching Assistants</h3>
-          <span className="text-sm text-gray-500">{tas.length} TAs</span>
+          <span className="text-sm text-gray-500">
+            {activeCount} active
+            {inactiveCount > 0 && ` · ${inactiveCount} inactive`}
+          </span>
         </div>
 
         {tas.length > 0 ? (
@@ -190,20 +196,25 @@ export default function ManageTAsForm({ tas, onUpdate }) {
               <div 
                 key={ta.id} 
                 className={`flex items-center justify-between p-4 rounded-lg border ${
-                  ta.active ? 'bg-white' : 'bg-gray-50 opacity-60'
+                  ta.active ? 'bg-white' : 'bg-gray-50 border-gray-300'
                 }`}
               >
                 <div className="flex items-center">
                   <div>
-                    <div className="font-medium text-gray-900">
+                    <div className={`font-medium ${ta.active ? 'text-gray-900' : 'text-gray-500'}`}>
                       {ta.name}
                       {!ta.active && (
-                        <span className="ml-2 text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">
-                          Inactive
+                        <span className="ml-2 text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full">
+                          Deactivated
                         </span>
                       )}
                     </div>
                     <div className="text-sm text-gray-500">{ta.email}</div>
+                    {!ta.active && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Hidden from new hour entries — past hours are kept for payroll
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -211,7 +222,7 @@ export default function ManageTAsForm({ tas, onUpdate }) {
                   onClick={() => handleDeleteTA(ta)}
                   disabled={deleteLoading[ta.id]}
                   className="text-red-600 hover:text-red-800 disabled:opacity-50 p-2 rounded-md hover:bg-red-50"
-                  title={ta.active ? "Delete TA" : "Remove inactive TA"}
+                  title={ta.active ? "Remove TA" : "Permanently delete this deactivated TA"}
                 >
                   {deleteLoading[ta.id] ? (
                     <div className="animate-spin h-4 w-4 border-2 border-red-600 border-t-transparent rounded-full"></div>
@@ -235,9 +246,10 @@ export default function ManageTAsForm({ tas, onUpdate }) {
         <div className="flex items-start">
           <AlertTriangle className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
           <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1">Delete Policy:</p>
+            <p className="font-medium mb-1">Removal Policy:</p>
             <p>• TAs with no hours logged will be permanently deleted</p>
-            <p>• TAs with existing hours will be deactivated (hidden from new entries)</p>
+            <p>• TAs with existing hours will be deactivated, not deleted</p>
+            <p>• Deactivated TAs stay in this list marked <span className="font-medium">Deactivated</span>, but no longer appear when logging new hours</p>
           </div>
         </div>
       </div>

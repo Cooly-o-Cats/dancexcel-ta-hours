@@ -163,7 +163,7 @@ export default function DashboardPage() {
   const fetchTAs = async () => {
     try {
       const token = localStorage.getItem('admin_token')
-      const response = await fetch('/api/tas', {
+      const response = await fetch('/api/tas?includeInactive=true', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       const data = await response.json()
